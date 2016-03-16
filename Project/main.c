@@ -215,12 +215,12 @@ uint16_t getHMCAngle(){
   y = (hi << 8) & 0xff00 | lo;
   angle = atan((double)y/x)* 180 / PI;
   if (x < 0){
-    return (uint16_t)(angle + 180);
+    return (uint16_t)angle + 180;
   }
   if (x > 0 && y < 0){
-    return (int)(angle + 360);
+    return (uint16_t)angle + 360;
   }
-  return (uint16_t)(angle);
+  return (uint16_t)angle;
 }
   
 /******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/

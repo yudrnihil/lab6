@@ -22,16 +22,24 @@
 #define BMP085_Addr	0xEE
 #define ADXL345_Addr	0xA6
 
+#define PI 3.14159265358979323846
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 I2C_InitTypeDef I2C_InitStructure;
 ErrorStatus HSEStartUpStatus;
 uint16_t i;
+
+int16_t x;
+int16_t y;
+u8 angleChar[3];
+
 /* Private function prototypes -----------------------------------------------*/
 void RCC_Configuration(void);
 void HMC_Init(void);
 void LongDelay(u32 nCount);
 void Delayms(u32 m);
+uint16_t getHMCAngle();
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -63,6 +71,13 @@ int main(void)
   {
     /* Please add code below to complete the LAB6 */
     /* You might want to create your own functions */
+    uint16_t angle = getHMCAngle();
+    angleChar[0] = HexValueOffset[angle/100];
+    angleChar[1] = HexValueOffset[(angle%100)/10];
+    angleChar[2] = HexValueOffset[angle%10];
+    LCD_DrawString(0, 0, "Angle:", 6);
+    LCD_DrawString(2, 0, angleChar, 3);
+    
 	
 
 
@@ -182,4 +197,30 @@ void Delayms(u32 m)
   for(; m != 0; m--)	
        for (i=0; i<50000; i++);
 }
+
+/**
+ *get x, y value from HMC5883 and calculate the angle. The angle is in degrees 
+ *0 ~ 359
+ */
+uint16_t getHMCAngle(){
+  uint8_t hi, lo;
+  double angle;
+  I2C_ByteWrite(0x3C, 0x02, 0x01);
+  Delayms(10);
+  hi = I2C_ByteRead(0x3C, 0x03);
+  lo = I2C_ByteRead(0x3C, 0x04);
+  x = (hi << 8) & 0xff00 | lo;
+  hi = I2C_ByteRead(0x3C, 0x07);
+  lo = I2C_ByteRead(0x3C, 0x08);
+  y = (hi << 8) & 0xff00 | lo;
+  angle = atan((double)y/x)* 180 / PI;
+  if (x < 0){
+    return (uint16_t)(angle + 180);
+  }
+  if (x > 0 && y < 0){
+    return (int)(angle + 360);
+  }
+  return (uint16_t)(angle);
+}
+  
 /******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/

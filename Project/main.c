@@ -34,7 +34,7 @@ uint16_t i;
 int16_t x;
 int16_t y;
 u8 angleChar[3];
-uint16_t segment[10]={0x01F8,0x00c0,0x01b4,0x01e4,0x00e4,0x016c,0x017c,0x01c0,0x01fc,0x01ec};
+uint16_t segment[10]={0x01f8,0x00c0,0x01b4,0x01e4,0x00cc,0x016c,0x017c,0x01c0,0x01fc,0x01ec};
 
 /* Private function prototypes -----------------------------------------------*/
 void RCC_Configuration(void);
@@ -75,7 +75,7 @@ int main(void)
                               | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 ;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOF, &GPIO_InitStructure);
+  GPIO_Init(GPIOG, &GPIO_InitStructure);
 
 
   while (1)
@@ -89,7 +89,7 @@ int main(void)
     LCD_DrawString(0, 0, "Angle:", 6);
     LCD_DrawString(2, 0, angleChar, 3);
     
-    GPIOG->ODR=segment[angle%10-1];
+    GPIOG->ODR=~segment[angle%10];
 
 
     /* main code ends here */
